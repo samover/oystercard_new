@@ -5,6 +5,7 @@ describe Oystercard do
     # expect(subject.balance).to be(0)
   end
 
+  let(:station) {double(:exist? => true)}
 
   context 'topping up' do
 
@@ -21,17 +22,28 @@ describe Oystercard do
 
       before(:each) {allow(subject).to receive(:balance).and_return(Oystercard::MINIMUM_FARE)}
       it 'changes the journey status to true when touch_in is invoked' do
-        expect(subject.touch_in).to eq true
+        subject.touch_in(station)
+        expect(subject.in_journey?).to eq true
       end
 
       it 'in_journey returns the journey_status' do
-        subject.touch_in
+        subject.touch_in(station)
         expect(subject.in_journey?).to eq true
       end
 
       it 'changes the journey status to false when touch_out is invoked' do
+        allow(subject.entry_station).to receive(:exist?).and_return false
         subject.touch_out
         expect(subject.in_journey?).to eq false
+      end
+
+      it 'records station where touch in is invoked' do
+        expect(subject.touch_in(station)).to eq station
+      end
+
+      it 'forgets the station when touch out is invoked' do
+        subject.touch_out
+        expect(subject.entry_station).to eq nil
       end
     end
 
@@ -43,7 +55,7 @@ describe Oystercard do
 
   context 'making journeys with a balance of zero' do
     it 'raises an error if the balance is below minimum fare when touching in' do
-        expect{subject.touch_in}.to raise_error 'Not enough balance for this journey'
+        expect{subject.touch_in(station)}.to raise_error 'Not enough balance for this journey'
     end
   end
 end
