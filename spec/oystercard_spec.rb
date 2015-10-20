@@ -17,29 +17,33 @@ describe Oystercard do
     end
   end
 
-  context 'making journeys' do
+  context 'making journeys when you have a balance' do
 
-      it 'deducts the amount in the argument from the balance' do
-        expect{subject.deduct(1)}.to change{subject.balance}.by(-1)
-      end
-
+      before(:each) {allow(subject).to receive(:balance).and_return(Oystercard::MINIMUM_FARE)}
       it 'changes the journey status to true when touch_in is invoked' do
-        allow(subject).to receive(:balance).and_return (Oystercard::MINIMUM_FARE)
         expect(subject.touch_in).to eq true
       end
 
-      it 'changes the journey status to false when touch_out is invoked' do
-        expect(subject.touch_out).to eq false
-      end
-
       it 'in_journey returns the journey_status' do
-        allow(subject).to receive(:balance).and_return (Oystercard::MINIMUM_FARE)
         subject.touch_in
         expect(subject.in_journey?).to eq true
       end
 
-      it 'raises an error if the balance is below minimum fare when touching in' do
-        expect{subject.touch_in}.to raise_error 'Not enough balance for this journey'
+      it 'changes the journey status to false when touch_out is invoked' do
+        subject.touch_out
+        expect(subject.in_journey?).to eq false
       end
+    end
+
+  context 'spending money' do
+    it 'deducts the minimum fare from balance when touch_out is invoked' do
+        expect{subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
+      end
+  end
+
+  context 'making journeys with a balance of zero' do
+    it 'raises an error if the balance is below minimum fare when touching in' do
+        expect{subject.touch_in}.to raise_error 'Not enough balance for this journey'
+    end
   end
 end
