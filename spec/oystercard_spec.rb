@@ -24,6 +24,7 @@ describe Oystercard do
       end
 
       it 'changes the journey status to true when touch_in is invoked' do
+        allow(subject).to receive(:balance).and_return (Oystercard::MINIMUM_FARE)
         expect(subject.touch_in).to eq true
       end
 
@@ -32,8 +33,13 @@ describe Oystercard do
       end
 
       it 'in_journey returns the journey_status' do
+        allow(subject).to receive(:balance).and_return (Oystercard::MINIMUM_FARE)
         subject.touch_in
         expect(subject.in_journey?).to eq true
+      end
+
+      it 'raises an error if the balance is below minimum fare when touching in' do
+        expect{subject.touch_in}.to raise_error 'Not enough balance for this journey'
       end
   end
 end
