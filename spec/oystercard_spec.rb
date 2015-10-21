@@ -29,10 +29,7 @@ describe Oystercard do
         expect(card).not_to be_in_journey
       end
 
-      it 'records station where touch in is invoked' do
-        card.touch_in(station)
-        expect(card.entry_station).to eq station
-      end
+
 
       it 'forgets the station when touch out is invoked' do
         card.touch_out(station)
@@ -42,6 +39,7 @@ describe Oystercard do
 
   context 'spending money' do
     it 'deducts the minimum fare from balance when touch_out is invoked' do
+        card.touch_in(:entry)
         expect{card.touch_out(station)}.to change{card.balance}.by(-Oystercard::MINIMUM_FARE)
       end
   end
@@ -63,5 +61,24 @@ describe Oystercard do
       expect(card.journey.first).to include :entry
     end
 
+    context '#touch_in' do
+      it 'records station' do
+        card.touch_in(station)
+        expect(card.entry_station).to eq station
+      end
+
+      it 'deducts a penalty charge if failed to do' do
+        card.touch_in(:entry)
+        expect{card.touch_in :entry}.to change {card.balance}.by(-Oystercard::PENALTY_FARE)
+      end
+    end
+
+    context '#touch_out' do
+      it 'deducts a penalty charge if failed to do' do
+        expect{card.touch_out :exit}.to change {card.balance}.by(-Oystercard::PENALTY_FARE)
+      end
+
+    end
   end
+
 end
