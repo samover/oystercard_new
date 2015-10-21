@@ -1,13 +1,16 @@
 require 'capybara/rspec'
+require 'oystercard'
+require 'journey'
 
 describe 'oystercard' do
   let(:card) { Oystercard.new(20) }
+  let(:journey) { Journey.new }
 
   feature 'I want to see my previous trips' do
     scenario 'after one trip' do
       card.touch_in('entry_station')
       card.touch_out('exit_station')
-      expect(card.journey.first).to include 'entry_station'
+      expect(card.journey.history.first).to include 'entry_station'
     end
   end
 
@@ -20,4 +23,5 @@ describe 'oystercard' do
       expect{card.touch_out('exit_station')}.to change {card.balance}.by(-Oystercard::PENALTY_FARE)
     end
   end
+
 end

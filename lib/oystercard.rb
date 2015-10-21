@@ -1,17 +1,17 @@
-require_relative 'station'
-
+require_relative 'station'  # => true
+require_relative 'journey'  # => true
 class Oystercard
 
-  LIMIT = 90
-  MINIMUM_FARE = 1
-  DEFAULT_BALANCE = 0
-  PENALTY_FARE = 6
+  LIMIT = 90           # => 90
+  MINIMUM_FARE = 1     # => 1
+  DEFAULT_BALANCE = 0  # => 0
+  PENALTY_FARE = 6     # => 6
 
-  attr_reader :balance, :entry_station, :journey
+  attr_reader :balance, :entry_station, :journey  # => nil
 
   def initialize(balance = DEFAULT_BALANCE)
-    @balance = balance
-    @journey = []
+    @balance = balance                       # => 20
+    @journey = Journey.new                   # => #<Journey:0x007fb4c4089078 @history=[]>
   end
 
   def top_up(money)
@@ -19,30 +19,31 @@ class Oystercard
     @balance += money
   end
 
-  def touch_in(station)
-    deduct(PENALTY_FARE) unless entry_station.nil?
-    fail 'Not enough balance for this journey' if balance < MINIMUM_FARE
-    @entry_station = station
+  def touch_in(entry_station)
+    deduct(PENALTY_FARE) if in_journey?                                   # => nil
+    fail 'Not enough balance for this journey' if balance < MINIMUM_FARE  # => nil
+    journey.set_entry_station(entry_station)                              # => #<struct Station name="Victoria", zone=2>
   end
 
   def touch_out(exit_station)
-    entry_station.nil? ? deduct(PENALTY_FARE) : deduct(MINIMUM_FARE)
-    log(exit_station)
-    @entry_station = nil
-    "#{exit_station}: #{balance}"
+    in_journey? ? deduct(MINIMUM_FARE) : deduct(PENALTY_FARE)  # => 19
+    journey.log(exit_station)                                  # => [{#<struct Station name="Victoria", zone=2>=>#<struct Station name="Aldgate", zone=3>}]
+    journey.set_entry_station(nil)                    # => #<struct Station name="Aldgate", zone=3>
+    # "#{exit_station}: #{balance}"
   end
-
   def in_journey?
-    !@entry_station.nil?
+    !journey.entry_station.nil?
   end
-
-  def log(exit_station)
-    journey << { entry_station => exit_station }
-  end
-
-private
-
+private                                                        # => Oystercard
     def deduct(money)
-      @balance -= money
+      @balance -= money                                        # => 19
     end
 end
+
+card = Oystercard.new(20)          # => #<Oystercard:0x007fb4c4089168 @balance=20, @journey=#<Journey:0x007fb4c4089078 @history=[]>>
+card.touch_in STATIONS[:victoria]  # => #<struct Station name="Victoria", zone=2>
+card.touch_out STATIONS[:aldgate]  # => #<struct Station name="Aldgate", zone=3>
+card.journey                       # => #<Journey:0x007fb4c4089078 @history=[{#<struct Station name="Victoria", zone=2>=>#<struct Station name="Aldgate", zone=3>}], @entry_station=#<struct Station name="Aldgate", zone=3>>
+
+# >> nil
+# >> #<struct Station name="Victoria", zone=2>
