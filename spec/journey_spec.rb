@@ -15,15 +15,17 @@ describe Journey do
     end
   end
 
-  # context '#fare' do
-  #   it 'returns minimum fare' do
-  #     expect(journey.fare).to eq described_class::MINIMUM_FARE
-  #   end
-  #   it 'retuns penalty fare when no entry_station' do
-  #
-  #   end
-  #   it 'retuns penalty fare when no exit_station' do
-  #
-  #   end
-  # end
+  context '#fare' do
+    it 'returns minimum fare' do
+      expect(journey.fare).to eq described_class::MINIMUM_FARE
+    end
+    it 'retuns penalty fare when no entry_station' do
+      journey.history << { nil => :exit_station }
+      expect(journey.fare).to eq described_class::PENALTY_FARE
+    end
+    it 'retuns penalty fare when no exit_station' do
+      journey.set_entry_station :entry_station
+      expect(journey.in_progress?).to eq true
+    end
+  end
 end

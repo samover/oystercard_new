@@ -5,6 +5,8 @@ describe Oystercard do
     subject(:card) { Oystercard.new(20)}
     let(:new_card) { Oystercard.new }
     let(:station) { :station }
+    let(:penalty_fare) { Journey::PENALTY_FARE }
+    let(:minimum_fare) { Journey::MINIMUM_FARE }
 
   context '#top_up' do
     it 'can top up the balance' do
@@ -25,7 +27,7 @@ describe Oystercard do
     end
     it 'deducts a penalty charge if failed to do' do
       card.touch_in(:entry)
-      expect{card.touch_in :entry}.to change {card.balance}.by(-Oystercard::PENALTY_FARE)
+      expect{card.touch_in :entry}.to change {card.balance}.by(-penalty_fare)
     end
     it 'now in_journey' do
       card.touch_in(station)
@@ -36,10 +38,10 @@ describe Oystercard do
   context '#touch_out' do
     it 'deducts minimum fare' do
       card.touch_in(:entry)
-      expect{card.touch_out(station)}.to change{card.balance}.by(-Oystercard::MINIMUM_FARE)
+      expect{card.touch_out(station)}.to change{card.balance}.by(-minimum_fare)
       end
     it 'deducts a penalty charge if failed to do' do
-      expect{card.touch_out :exit}.to change {card.balance}.by(-Oystercard::PENALTY_FARE)
+      expect{card.touch_out :exit}.to change {card.balance}.by(-penalty_fare)
     end
     it 'no longer in_journey' do
       card.touch_out(station)
