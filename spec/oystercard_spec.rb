@@ -56,10 +56,12 @@ describe Oystercard do
     it 'log is empty by default' do
       expect(card.journey).to be_empty
     end
+
     it 'logs entry and exit station after a journey' do
       card.touch_in(:entry)
       card.touch_out(:exit)
       expect(card.journey.first).to include :entry
     end
+
   end
 end
