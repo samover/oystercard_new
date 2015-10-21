@@ -17,13 +17,9 @@ class Journey
   end
 
   def fare
-    if in_progress?
-      return PENALTY_FARE if entry_station
-    elsif !@history.empty?
-      return PENALTY_FARE if history.last.has_key?(nil)
-    else
-      return MINIMUM_FARE
-    end
+    return PENALTY_FARE if in_progress?
+    return PENALTY_FARE if !@history.empty? && history.last.has_key?(nil)
+    MINIMUM_FARE
   end
 
   def in_progress?
