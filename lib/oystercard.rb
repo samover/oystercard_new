@@ -8,10 +8,11 @@ class Oystercard
 
   attr_reader :balance, :entry_station, :exit_station, :journeys, :journey_klass, :journey
 
-  def initialize(balance: DEF_BALANCE, journey_klass: Journey)
+  def initialize(balance: DEF_BALANCE, journey_klass: Journey, journey_log_klass: JourneyLog)
     @balance = balance
     @journeys = []
     @journey_klass = journey_klass
+    @journey_log_klass = journey_log_klass.new
   end
 
   def topup value
