@@ -1,31 +1,42 @@
 require 'journey'
 
 describe Journey do
-  subject(:journey) { Journey.new }
-  let(:card) {double(:card)}
-
-  context '#log' do
-    it 'is empty by default' do
-      expect(journey.history).to be_empty
-    end
-    it 'logs entry and exit station after a journey' do
-      journey.set_entry_station :entry_station
-      journey.log :exit_station
-      expect(journey.history[0]).to eq(entry_station: :exit_station)
+  subject(:journey) { described_class.new(entry_station: :entry_station)}
+  describe 'a new journey' do
+    it 'has an entry station' do
+      expect(journey.entry_station).to eq :entry_station
     end
   end
 
-  context '#fare' do
-    it 'returns minimum fare' do
-      expect(journey.fare).to eq described_class::MINIMUM_FARE
+  describe 'complete a journey' do
+    it 'registers the exit station' do
+      journey.complete(:exit_station)
+      expect(journey.exit_station).to eq :exit_station
     end
-    it 'retuns penalty fare when no entry_station' do
-      journey.history << { nil => :exit_station }
-      expect(journey.fare).to eq described_class::PENALTY_FARE
+  end
+
+  describe '#complete?' do
+    it 'knows when a journey is complete' do
+      journey.complete(:exit_station)
+      expect(journey).to be_complete
     end
-    it 'retuns penalty fare when no exit_station' do
-      journey.set_entry_station :entry_station
-      expect(journey.in_progress?).to eq true
+  end
+
+  describe '#fare' do
+    context 'journey complete' do
+      it 'returns the minimum fare' do
+        journey.complete(:exit_station)
+        expect(journey.fare).to eq described_class::MIN_FARE
+      end
+    end
+    context 'returns penalty fare at incomplete journey' do
+      it 'when no exit station is given' do
+        expect(journey.fare).to eq described_class::PENALTY_FARE
+      end
+      it 'when no entry station is given' do
+        journey = Journey.new(entry_station: nil)
+        expect(journey.fare).to eq described_class::PENALTY_FARE
+      end
     end
   end
 end
