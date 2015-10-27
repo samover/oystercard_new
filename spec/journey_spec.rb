@@ -4,7 +4,7 @@ describe Journey do
   subject(:journey) { described_class.new(entry_station: :entry_station)}
   describe 'a new journey' do
     it 'has an entry station' do
-      expect(journey.entry_station).to eq :entry_station
+      expect(journey.entry_station).to include :entry_station
     end
   end
 
